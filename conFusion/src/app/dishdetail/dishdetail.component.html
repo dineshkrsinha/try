@@ -1,0 +1,117 @@
+<div class="container" fxLayout="row" fxLayout.sm="column" fxLayout.xs="column" fxLayoutAlign.gt-md="space-around center"
+    fxLayoutGap="10px" fxLayoutGap.xs="0">
+    <div fxFlex="40">
+
+        <div fxFlex *ngIf="dish" [@visibility]="visibility" [@expand]>
+            <md-card>
+                <md-card-header>
+                    <md-card-title>
+                        <h3>{{dish.name | uppercase}}</h3>
+                    </md-card-title>
+                </md-card-header>
+                <img md-card-image src={{BaseURL+dish.image}} alt={{dish.name}}>
+                <md-card-content>
+                    <p>
+                        {{dish.description}}
+                    </p>
+                </md-card-content>
+                <md-card-actions>
+                    <button md-button [routerLink]="['/dishdetail', prev]">
+                        <span class="fa fa-chevron-left fa-lg"></span>
+                    </button>
+                    <button md-button (click)="goBack()">BACK</button>
+                    <button md-button>LIKE</button>
+                    <button md-button>SHARE</button>
+                    <button md-button [routerLink]="['/dishdetail', next]">
+                        <span class="fa fa-chevron-right fa-lg"></span>
+                    </button>
+                </md-card-actions>
+            </md-card>
+        </div>
+        <div [hidden]="dish || errMess">
+            <md-spinner></md-spinner>
+            <h4>Loading . . . Please Wait</h4>
+        </div>
+        <div *ngIf="errMess">
+            <h2>Error</h2>
+            <h4>{{errMess}}</h4>
+          </div>
+
+    </div>
+    <div fxFlex="40" layout="column" layout-align="left">
+        <div>
+            <md-list fxFlex *ngIf="dish" [@visibility]="visibility" [@expand]>
+                <h2 md-line> Comments </h2>
+                <md-list-item *ngFor="let comment of dish.comments">
+                    <p md-line>
+                        <span>
+                            <br />
+                            <div *ngIf="comment.date; else temporarycomment">
+                                    {{comment.comment}} 
+                                </div>
+    
+                                <ng-template #temporarycomment>
+                                    <br/>-------------------------------<br/>
+                                    {{comment.comment}}
+                                </ng-template>
+                        </span>
+                    </p>
+                    <p md-line>
+                        <span> {{comment.rating}} stars</span>
+                    </p>
+                    <p md-line>
+                        <span>
+                            <i> .. {{comment.author}}, {{comment.date | date}}</i>
+                        </span>
+                    </p>
+                   
+                </md-list-item>
+                <br/>
+                <br/>
+            </md-list>
+            <div [hidden]="dish">
+                <md-spinner></md-spinner>
+                <h4>Loading . . . Please Wait</h4>
+            </div>
+        </div>
+        <div>
+
+            <div fxFlex fxFlexOffset="20px" class="form-size">
+
+                <form novalidate [formGroup]="commentForm" (ngSubmit)="onSubmit()" style="border:1px solid gray;">
+                    <p>
+                        <md-input-container class="full-width" dividerColor="{{(formErrors.author) ? 'warn' : 'primary'}}">
+                            <input mdInput formControlName="author" placeholder="Name" type="text" required>
+                            <md-hint>
+                                <span [hidden]="!(formErrors.author)">
+                                    {{formErrors.author}}</span>
+                            </md-hint>
+                        </md-input-container>
+
+                    </p>
+
+                    <div style="width:100px;padding:10px;">
+                        <span>Rating</span>
+                        <!-- Because of conflicts in using mat and md controls in the same project, I had to use md-slider -->
+                        <!-- As per the documentation I read, this appeared to be an issue with newer vesion of Angular -->
+                        <md-slider md-discrete flex thumbLabel tickInterval="4" min="0" max="5" aria-label="rating" formControlName="rating"></md-slider>
+                    </div>
+
+
+                    <p>
+                        <md-input-container class="full-width" dividerColor="{{(formErrors.comment) ? 'warn' : 'primary'}}">
+                            <textarea mdInput formControlName="comment" placeholder="Your Comment" rows=5 required></textarea>
+                            <md-hint>
+                                <span [hidden]="!(formErrors.comment)">
+                                    {{formErrors.comment}}</span>
+                            </md-hint>
+                        </md-input-container>
+                    </p>
+                    <button type="submit" md-button class="background-primary text-floral-white" [style.color]="'white'" [style.background-color]="commentForm.invalid ? 'gray' : 'green'"
+                        [disabled]="commentForm.invalid">Submit</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
