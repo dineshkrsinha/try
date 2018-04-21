@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Feedback, ContactType } from '../shared/feedback';
-import { flyInOut } from '../animations/app.animation';
+import { flyInOut, expand } from '../animations/app.animation';
 
 import { FeedbackService } from '../services/feedback.service';
 
@@ -15,7 +15,8 @@ import { FeedbackService } from '../services/feedback.service';
     'style': 'display: block;'
     },
     animations: [
-      flyInOut()
+      flyInOut(),
+      expand()
     ]
 })
 export class ContactComponent implements OnInit {
@@ -25,6 +26,9 @@ export class ContactComponent implements OnInit {
   contactType = ContactType;
   response = null;
   errMess: string;
+  postInProgress: boolean = false;
+  timeInMs = 0;
+
 
   formErrors = {
     'firstname': '',
@@ -64,6 +68,7 @@ export class ContactComponent implements OnInit {
   }
 
   ngOnInit() {
+    
   }
 
   createForm() {
@@ -79,29 +84,45 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit() {
+    this.countUp();
+    this.postInProgress = true;
     this.feedback = this.feedbackForm.value;
 
     this.feedbackservice.submitFeedback(this.feedback)
     .subscribe(response => this.response = response,
       errmess => this.errMess = <any>errmess);
+      this.postInProgress = false;
 
 
     console.log(this.feedback);
-    this.feedbackForm.reset({
-      firstname: '',
-      lastname: '',
-      telnum: '',
-      email: '',
-      agree: false,
-      contacttype: 'None',
-      message: ''
-    });
+   
   }
 
+   countUp = function() {
+   // this.timeInMs = 0;
+   this.timeInMs = 500;
+    setTimeout(() => {
+      this.timeInMs = 0;
+
+      this.feedbackForm.reset({
+        firstname: '',
+        lastname: '',
+        telnum: '',
+        email: '',
+        agree: false,
+        contacttype: 'None',
+        message: ''
+      });
+
+    }, 5000);
+}
 
   onValueChanged(data?: any) {
+
     if (!this.feedbackForm) { return; }
     const form = this.feedbackForm;
+
+    
     for (const field in this.formErrors) {
       // clear previous error message (if any)
       this.formErrors[field] = '';
